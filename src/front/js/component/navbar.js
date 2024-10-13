@@ -11,7 +11,7 @@ export const Navbar = () => {
                         CalculateTruck
                     </Heading>
                 </Link>
-                <Link to="/demo">
+                <Link to="/profile">
                     <Button colorScheme="teal" variant="solid">
                         Check the Context in action
                     </Button>

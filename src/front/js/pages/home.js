@@ -18,8 +18,10 @@ import {
     ModalBody,
     ModalCloseButton
 } from "@chakra-ui/react";
-import axios from "axios"; // Asegúrate de importar axios
-import { useNavigate } from "react-router-dom"; // Importa useNavigate
+import axios from "axios"; 
+import { useNavigate } from "react-router-dom"; 
+
+
 
 export const Home = () => {
     const { store, actions } = useContext(Context);
