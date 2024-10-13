@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+import logging
 
 db = SQLAlchemy()
 
@@ -10,7 +11,7 @@ class User(db.Model):
     first_name = db.Column(db.String(120), nullable=False)
     last_name = db.Column(db.String(120), nullable=False)
     company = db.Column(db.String(120), nullable=True)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False, default=True)
+    is_active = db.Column(db.Boolean(), nullable=False, default=True)
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -28,4 +29,7 @@ class User(db.Model):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
+        if self.password_hash is None:
+            logging.error("No hay hash de contraseña para verificar")
+            return False
         return check_password_hash(self.password_hash, password)

@@ -18,39 +18,49 @@ import {
     ModalBody,
     ModalCloseButton
 } from "@chakra-ui/react";
+import axios from "axios"; // Asegúrate de importar axios
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 
 export const Home = () => {
     const { store, actions } = useContext(Context);
-    const toast = useToast(); // Para mostrar mensajes de éxito o error
+    const toast = useToast();
+    const navigate = useNavigate(); // Inicializa navigate
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState(""); // Estado para la confirmación de contraseña
-    const [firstName, setFirstName] = useState(""); // Estado para el nombre
-    const [lastName, setLastName] = useState(""); // Estado para el apellido
-    const [company, setCompany] = useState(""); // Estado para la empresa
-    const [isModalOpen, setIsModalOpen] = useState(false); // Estado para el modal
-    const [registerEmail, setRegisterEmail] = useState(""); // Estado para el correo electrónico en el registro
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [company, setCompany] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [registerEmail, setRegisterEmail] = useState("");
+    const [loginWarningMessage, setLoginWarningMessage] = useState(""); // Estado para el mensaje de advertencia
 
-    const handleLoginSubmit = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoginWarningMessage(''); // Limpiar mensajes de advertencia
+
         try {
-            await actions.login(email, password);
-            toast({
-                title: "Inicio de sesión exitoso.",
-                description: "Bienvenido de nuevo.",
-                status: "success",
-                duration: 3000,
-                isClosable: true,
-            });
+            const response = await axios.post(
+                `${process.env.BACKEND_URL}/api/login`,
+                { email, password }, // Utiliza los estados de email y contraseña
+                {
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
+
+            if (response.status === 200) {
+                const { token, user } = response.data;
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
+                navigate('/profile');
+            }
         } catch (error) {
-            toast({
-                title: "Error.",
-                description: error.message,
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-            });
+            if (error.response && error.response.status === 401) {
+                setLoginWarningMessage('Usuario no registrado o credenciales incorrectas');
+            } else {
+                setLoginWarningMessage(error.response ? error.response.data.error : 'Error en el inicio de sesión');
+            }
         }
     };
 
@@ -71,7 +81,7 @@ export const Home = () => {
                 duration: 3000,
                 isClosable: true,
             });
-            setIsModalOpen(false); // Cerrar el modal después de registrar
+            setIsModalOpen(false);
         } catch (error) {
             toast({
                 title: "Error.",
@@ -86,7 +96,8 @@ export const Home = () => {
     return (
         <Box className="text-center mt-5" maxW="400px" mx="auto" p={5}>
             <Heading mb={4}>Iniciar sesión</Heading>
-            <form onSubmit={handleLoginSubmit}>
+            {loginWarningMessage && <Text color="red.500">{loginWarningMessage}</Text>} {/* Mensaje de advertencia */}
+            <form onSubmit={handleSubmit}>
                 <FormControl isRequired mb={4}>
                     <FormLabel htmlFor="email">Correo electrónico</FormLabel>
                     <Input
@@ -154,8 +165,8 @@ export const Home = () => {
                             <Input
                                 id="register-email"
                                 type="email"
-                                value={registerEmail} // Usar el nuevo estado
-                                onChange={(e) => setRegisterEmail(e.target.value)} // Actualizar el estado del correo
+                                value={registerEmail}
+                                onChange={(e) => setRegisterEmail(e.target.value)}
                                 placeholder="Introduce tu correo electrónico"
                             />
                         </FormControl>

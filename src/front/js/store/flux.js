@@ -28,26 +28,19 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
                     const data = await resp.json();
                     setStore({ message: data.message });
-                    // No olvides devolver algo, así es como se resuelve el async
-                    return data;
+                    return data; // Asegúrate de devolver algo
                 } catch (error) {
                     console.log("Error al cargar el mensaje del backend", error);
                 }
             },
 
             changeColor: (index, color) => {
-                // Obtener el store
                 const store = getStore();
-
-                // Debemos recorrer todo el array demo para buscar el índice respectivo
-                // y cambiar su color
                 const demo = store.demo.map((elm, i) => {
                     if (i === index) elm.background = color;
                     return elm;
                 });
-
-                // Reiniciar el store global
-                setStore({ demo: demo });
+                setStore({ demo });
             },
 
             register: async (email, password, firstName, lastName, company) => {
@@ -75,13 +68,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                     const data = await response.json();
                     console.log("Registro exitoso:", data);
+
+                    // Actualiza el estado del usuario actual en el store
+                    setStore({ currentUser: data.user }); // Asumiendo que el backend devuelve la información del usuario registrado
+
                     return data; // Devuelve el resultado del registro
                 } catch (error) {
                     console.error("Error al registrar usuario:", error);
                     throw new Error(error.message);
                 }
-            }
+            },
 
+            
         }
     };
 };
