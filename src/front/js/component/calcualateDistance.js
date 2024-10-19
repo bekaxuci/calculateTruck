@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+  Stack,
+  Text,
+  Alert,
+  AlertIcon,
+} from '@chakra-ui/react';
 
 const CalculateDistance = ({ map, onRouteCalculated, onRouteInfo, onClearRoute }) => {
   const [stops, setStops] = useState([
     { location: '', key: 0 },
-    { location: '', key: 1 }
+    { location: '', key: 1 },
   ]);
   const [cargoWeight, setCargoWeight] = useState(0);
   const [containerType, setContainerType] = useState('');
@@ -15,7 +28,7 @@ const CalculateDistance = ({ map, onRouteCalculated, onRouteInfo, onClearRoute }
     'Nocturnidad',
     'Mercancía peligrosa',
     'Festivo',
-    'Basculante'
+    'Basculante',
   ];
 
   useEffect(() => {
@@ -67,37 +80,34 @@ const CalculateDistance = ({ map, onRouteCalculated, onRouteInfo, onClearRoute }
   };
 
   const handleOptionChange = (option) => {
-    setSelectedOptions(prev =>
+    setSelectedOptions((prev) =>
       prev.includes(option)
-        ? prev.filter(item => item !== option)
+        ? prev.filter((item) => item !== option)
         : [...prev, option]
     );
   };
 
-  // Nuevo: Función para calcular el consumo de combustible basado en el tipo de contenedor y peso
   const calculateFuelConsumption = (distanceKm) => {
     let baseFuelConsumption;
     switch (containerType) {
       case '20':
       case '20reefer':
-        baseFuelConsumption = 28; // 28 litros por 100 km para contenedores de 20'
+        baseFuelConsumption = 28;
         break;
       case '40':
       case '40reefer':
-        baseFuelConsumption = 32; // 32 litros por 100 km para contenedores de 40'
+        baseFuelConsumption = 32;
         break;
       default:
-        baseFuelConsumption = 30; // Valor por defecto
+        baseFuelConsumption = 30;
     }
 
-    // Ajuste por peso: aumenta el consumo un 2% por cada tonelada sobre las 20
     const weightAdjustment = Math.max(0, cargoWeight - 20) * 0.02;
     const adjustedConsumption = baseFuelConsumption * (1 + weightAdjustment);
 
     return (adjustedConsumption / 100) * distanceKm;
   };
 
-  // Nuevo: Función para calcular el BAF más detallado
   const calculateBAF = (baseFuelPrice, currentFuelPrice, totalFuelConsumption) => {
     const fuelPriceDifference = currentFuelPrice - baseFuelPrice;
     return fuelPriceDifference * totalFuelConsumption;
@@ -110,16 +120,16 @@ const CalculateDistance = ({ map, onRouteCalculated, onRouteInfo, onClearRoute }
     }
 
     const directionsService = new window.google.maps.DirectionsService();
-    const waypoints = stops.slice(1, -1).map(stop => ({
+    const waypoints = stops.slice(1, -1).map((stop) => ({
       location: stop.location,
-      stopover: true
+      stopover: true,
     }));
 
     const request = {
       origin: stops[0].location,
       destination: stops[stops.length - 1].location,
       waypoints: waypoints,
-      travelMode: 'DRIVING'
+      travelMode: 'DRIVING',
     };
 
     directionsService.route(request, (result, status) => {
@@ -130,48 +140,33 @@ const CalculateDistance = ({ map, onRouteCalculated, onRouteInfo, onClearRoute }
         let totalDistance = 0;
         let totalDuration = 0;
 
-        route.legs.forEach(leg => {
+        route.legs.forEach((leg) => {
           totalDistance += leg.distance.value;
           totalDuration += leg.duration.value;
         });
 
-        const distanceKm = totalDistance / 1000; // Convertir a km
-        const durationHours = totalDuration / 3600; // Convertir a horas
+        const distanceKm = totalDistance / 1000;
+        const durationHours = totalDuration / 3600;
 
-        // Cálculo del cambio porcentual en el precio del combustible
-        const baseFuelPrice = 1.10; // Precio base del ejemplo
-        const currentFuelPrice = 1.50; // Precio actual del ejemplo
+        const baseFuelPrice = 1.10;
+        const currentFuelPrice = 1.50;
 
-        // Nuevo: Cálculo del consumo de combustible utilizando la nueva función
         const totalFuelConsumption = calculateFuelConsumption(distanceKm);
-
-        // Nuevo: Cálculo del BAF utilizando la nueva función
         const bafCost = calculateBAF(baseFuelPrice, currentFuelPrice, totalFuelConsumption);
-
-        // Cálculo del costo del conductor fijo a 0.80 €/km
         const driverCostPerKm = 0.80;
         const driverCost = distanceKm * driverCostPerKm;
-
-        // Costo operacional total
         const totalOperationalCost = bafCost + driverCost;
-
-        // Cálculo del precio base
         const basePrice = distanceKm * parseFloat(tarifa);
 
-        // Cálculo de recargos
         let weightSurcharge = 0;
         if (showWeightAlert) {
-          weightSurcharge = basePrice * 0.25; // 25% de recargo por peso
+          weightSurcharge = basePrice * 0.25;
         }
 
-        // Recargo por opciones adicionales
         const optionsSurchargePercentage = selectedOptions.length * 0.05;
         const optionsSurcharge = basePrice * optionsSurchargePercentage;
 
-        // Precio final a cobrar
         const finalPrice = basePrice + weightSurcharge + optionsSurcharge;
-
-        // Cálculo del beneficio
         const profit = finalPrice - totalOperationalCost;
 
         const routeInfo = {
@@ -186,7 +181,7 @@ const CalculateDistance = ({ map, onRouteCalculated, onRouteInfo, onClearRoute }
           profit: `€${profit.toFixed(2)}`,
           fuelConsumption: `${totalFuelConsumption.toFixed(2)} litros`,
           bafCost: `€${bafCost.toFixed(2)}`,
-          toll: 'N/A' // Mantener esto si no se calcula el peaje
+          toll: 'N/A',
         };
 
         onRouteInfo(routeInfo);
@@ -199,7 +194,7 @@ const CalculateDistance = ({ map, onRouteCalculated, onRouteInfo, onClearRoute }
   const resetRoute = () => {
     setStops([
       { location: '', key: 0 },
-      { location: '', key: 1 }
+      { location: '', key: 1 },
     ]);
     setCargoWeight(0);
     setContainerType('');
@@ -210,102 +205,85 @@ const CalculateDistance = ({ map, onRouteCalculated, onRouteInfo, onClearRoute }
   };
 
   return (
-    <div className="card">
-      <div className="card-body">
-        <h5 className="card-title mb-3">Paradas</h5>
-        {stops.map((stop, index) => (
-          <div key={stop.key} className="mb-2 d-flex align-items-center">
-            <input
-              id={`location-${index}`}
-              type="text"
-              className="form-control me-2"
-              placeholder={index === 0 ? "Origen" : index === stops.length - 1 ? "Destino final" : `Parada ${index}`}
-              value={stop.location}
-              onChange={(e) => updateStop(index, 'location', e.target.value)}
-            />
-            {index === stops.length - 1 && (
-              <button className="btn btn-outline-secondary me-2" onClick={addStop}>+</button>
-            )}
-            {stops.length > 2 && index !== 0 && index !== stops.length - 1 && (
-              <button className="btn btn-outline-danger" onClick={() => removeStop(index)}>×</button>
-            )}
-          </div>
-        ))}
-
-        <div className="mt-3">
-          <label>Tipo de contenedor:</label>
-          <div className="input-group">
-            <select
-              className="form-select"
-              value={containerType}
-              onChange={(e) => setContainerType(e.target.value)}
-            >
-              <option value="">Selecciona un tipo</option>
-              <option value="20">20'</option>
-              <option value="40">40'</option>
-              <option value="20reefer">20' Reefer</option>
-              <option value="40reefer">40' Reefer</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="mt-3">
-          <label>Peso de la carga (toneladas):</label>
-          <input
-            type="number"
-            className="form-control"
-            value={cargoWeight}
-            onChange={(e) => setCargoWeight(parseFloat(e.target.value))}
-            placeholder="Ingresa el peso de la carga"
+    <Box borderWidth={1} borderRadius="lg" p={5} boxShadow="lg">
+      <Text fontSize="xl" mb={3}>Paradas</Text>
+      {stops.map((stop, index) => (
+        <Stack key={stop.key} mb={2} direction="row" alignItems="center">
+          <Input
+            id={`location-${index}`}
+            placeholder={index === 0 ? "Origen" : index === stops.length - 1 ? "Destino final" : `Parada ${index}`}
+            value={stop.location}
+            onChange={(e) => updateStop(index, 'location', e.target.value)}
           />
-        </div>
+          {index === stops.length - 1 && (
+            <Button onClick={addStop} colorScheme="teal">+</Button>
+          )}
+          {stops.length > 2 && index !== 0 && index !== stops.length - 1 && (
+            <Button onClick={() => removeStop(index)} colorScheme="red">×</Button>
+          )}
+        </Stack>
+      ))}
 
-        {showWeightAlert && (
-          <div className="alert alert-warning mt-3">
-            Se aplicará un recargo del 25% debido al exceso de peso.
-          </div>
-        )}
+      <FormControl mt={3}>
+        <FormLabel>Tipo de contenedor:</FormLabel>
+        <Select
+          value={containerType}
+          onChange={(e) => setContainerType(e.target.value)}
+        >
+          <option value="">Selecciona un tipo</option>
+          <option value="20">20'</option>
+          <option value="40">40'</option>
+          <option value="20reefer">20' Reefer</option>
+          <option value="40reefer">40' Reefer</option>
+        </Select>
+      </FormControl>
 
-        <div className="mt-3">
-          <h5 className="card-title mb-3">Introducir Tarifa</h5>
-          <div className="input-group">
-            <input
-              type="number"
-              className="form-control"
-              value={tarifa}
-              onChange={(e) => setTarifa(e.target.value)}
-              placeholder="0.00"
-              step="0.01"
-            />
-            <span className="input-group-text">€/km</span>
-          </div>
-        </div>
+      <FormControl mt={3}>
+        <FormLabel>Peso de la carga (toneladas):</FormLabel>
+        <Input
+          type="number"
+          value={cargoWeight}
+          onChange={(e) => setCargoWeight(parseFloat(e.target.value))}
+          placeholder="Ingresa el peso de la carga"
+        />
+      </FormControl>
 
-        <div className="mt-3">
-          <h5 className="card-title mb-3">Opciones Adicionales</h5>
-          <div className="d-flex flex-wrap">
-            {additionalOptions.map((option, index) => (
-              <div key={index} className="form-check me-3 mb-2">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  checked={selectedOptions.includes(option)}
-                  onChange={() => handleOptionChange(option)}
-                />
-                <label className="form-check-label">{option}</label>
-              </div>
-            ))}
-          </div>
-        </div>
+      {showWeightAlert && (
+        <Alert status="warning" mt={3}>
+          <AlertIcon />
+          Se aplicará un recargo del 25% debido al exceso de peso.
+        </Alert>
+      )}
 
-        <button className="btn btn-warning mt-3" onClick={calculateRoute}>
-          Calcular Ruta
-        </button>
-        <button className="btn btn-secondary mt-3 ms-2" onClick={resetRoute}>
-          Limpiar
-        </button>
-      </div>
-    </div>
+      <FormControl mt={3}>
+        <FormLabel>Introducir Tarifa</FormLabel>
+        <Stack direction="row">
+          <Input
+            type="number"
+            value={tarifa}
+            onChange={(e) => setTarifa(e.target.value)}
+            placeholder="Tarifa por km"
+          />
+        </Stack>
+      </FormControl>
+
+      <FormControl mt={3}>
+        <FormLabel>Opciones adicionales:</FormLabel>
+        {additionalOptions.map((option) => (
+          <Checkbox
+            key={option}
+            isChecked={selectedOptions.includes(option)}
+            onChange={() => handleOptionChange(option)}
+            mt={2}
+          >
+            {option}
+          </Checkbox>
+        ))}
+      </FormControl>
+
+      <Button mt={4} colorScheme="blue" onClick={calculateRoute}>Calcular ruta</Button>
+      <Button mt={4} ml={2} colorScheme="gray" onClick={resetRoute}>Restablecer</Button>
+    </Box>
   );
 };
 

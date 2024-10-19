@@ -1,8 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import CalculateDistance from '../component/calcualateDistance';
-import { IoMdArrowRoundBack } from "react-icons/io";
-import { Link, useNavigate } from 'react-router-dom'; // Importa useNavigate
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  Container,
+  Heading,
+  Grid,
+  Card,
+  CardBody,
+  Text,
+  Table,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  VStack,
+  HStack,
+  Flex,
+  GridItem
+} from '@chakra-ui/react';
 
 export const Profile = () => {
   const apiOptions = { apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY };
@@ -43,11 +61,6 @@ export const Profile = () => {
     setRouteInfo(info);
   };
 
-  const handleProfile = () => {
-    navigate('/profile'); // Mostrar el modal al hacer clic en "Mi Perfil"
-    window.location.reload()
-  };
-
   const clearRoute = () => {
     if (directionsRenderer) {
       directionsRenderer.setDirections({ routes: [] });
@@ -55,108 +68,101 @@ export const Profile = () => {
     setRouteInfo(null);
   };
 
-  const iconStyle = {
-    fontSize: '2rem',
-    color: '#ffc107',
-    transition: 'color 0.3s ease',
-    cursor: 'pointer', // Añade cursor pointer para mostrar que es clicable
-  };
-
   return (
-    <div className="min-vh-100 d-flex">
-      <div className="container-fluid">
-        <div className="row g-4">
-          <div className="col-lg-4">
-            <div className="card h-100">
-              <div className="card-body">
-                <div className="d-flex flex-column align-items-start mb-4">
-                  <h1 className="card-title">Planner</h1>
-                </div>
-                <CalculateDistance
-                  map={map}
-                  onRouteCalculated={handleRouteCalculated}
-                  onRouteInfo={handleRouteInfo}
-                  onClearRoute={clearRoute}
-                />
-
-              </div>
-            </div>
-          </div>
-          <div className="col-lg-8">
-            <div className="card h-100">
-              <div className="card-body">
-                <div
+    <Container maxW="container.xl" p={4}>
+      <Flex minH="100vh" flexDirection="column">
+        <Grid templateColumns="repeat(4, 1fr)" gap={4}>
+          <GridItem colSpan={{ base: 4, lg: 1 }}>
+            <Card>
+              <CardBody>
+                <VStack align="start">
+                  <Heading as="h1" size="lg">Planner</Heading>
+                  <CalculateDistance
+                    map={map}
+                    onRouteCalculated={handleRouteCalculated}
+                    onRouteInfo={handleRouteInfo}
+                    onClearRoute={clearRoute}
+                  />
+                </VStack>
+              </CardBody>
+            </Card>
+          </GridItem>
+          <GridItem colSpan={{ base: 4, lg: 3 }}>
+            <Card>
+              <CardBody>
+                <Box
                   ref={mapRef}
-                  style={{ height: "100%", minHeight: "500px", borderRadius: "10px" }}
-                  className="border border-primary"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
+                  height="100%"
+                  minHeight="500px"
+                  borderRadius="10px"
+                  borderWidth="1px"
+                  borderColor="blue.400"
+                ></Box>
+              </CardBody>
+            </Card>
+          </GridItem>
+        </Grid>
+
         {routeInfo && (
-          <div className="row mt-4">
-            <div className="col-12">
-              <div className="card">
-                <div className="card-body">
-                  <h3 className="card-title">Información de la ruta</h3>
-                  <div className="row">
-                    <div className="col-md-6">
-                      <table className="table table-striped table-bordered">
-                        <tbody>
-                          <tr>
-                            <th>Distancia</th>
-                            <td>{routeInfo.distance}</td>
-                          </tr>
-                          <tr>
-                            <th>Duración</th>
-                            <td>{routeInfo.duration}</td>
-                          </tr>
-                          <tr>
-                            <th>Precio por km</th>
-                            <td>{routeInfo.pricePerKm}</td>
-                          </tr>
-                          <tr>
-                            <th>Costo operacional</th>
-                            <td>{routeInfo.operationalCost}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <div className="col-md-6">
-                      <table className="table table-striped table-bordered">
-                        <tbody>
-                          <tr>
-                            <th>Precio base</th>
-                            <td>{routeInfo.basePrice}</td>
-                          </tr>
-                          <tr>
-                            <th>Recargo por peso</th>
-                            <td>{routeInfo.weightSurcharge}</td>
-                          </tr>
-                          <tr>
-                            <th>Adicionales</th>
-                            <td>{routeInfo.optionsSurcharge}</td>
-                          </tr>
-                          <tr>
-                            <th>Precio final</th>
-                            <td>{routeInfo.finalPrice}</td>
-                          </tr>
-                          <tr>
-                            <th>Beneficio</th>
-                            <td>{routeInfo.profit}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Box mt={4}>
+            <Card>
+              <CardBody>
+                <Heading as="h3" size="md">Información de la ruta</Heading>
+                <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={4}>
+                  <Box>
+                    <Table variant="striped" colorScheme="teal">
+                      <Tbody>
+                        <Tr>
+                          <Th>Distancia</Th>
+                          <Td>{routeInfo.distance}</Td>
+                        </Tr>
+                        <Tr>
+                          <Th>Duración</Th>
+                          <Td>{routeInfo.duration}</Td>
+                        </Tr>
+                        <Tr>
+                          <Th>Precio por km</Th>
+                          <Td>{routeInfo.pricePerKm}</Td>
+                        </Tr>
+                        <Tr>
+                          <Th>Costo operacional</Th>
+                          <Td>{routeInfo.operationalCost}</Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
+                  </Box>
+                  <Box>
+                    <Table variant="striped" colorScheme="teal">
+                      <Tbody>
+                        <Tr>
+                          <Th>Precio base</Th>
+                          <Td>{routeInfo.basePrice}</Td>
+                        </Tr>
+                        <Tr>
+                          <Th>Recargo por peso</Th>
+                          <Td>{routeInfo.weightSurcharge}</Td>
+                        </Tr>
+                        <Tr>
+                          <Th>Adicionales</Th>
+                          <Td>{routeInfo.optionsSurcharge}</Td>
+                        </Tr>
+                        <Tr>
+                          <Th>Precio final</Th>
+                          <Td>{routeInfo.finalPrice}</Td>
+                        </Tr>
+                        <Tr>
+                          <Th>Beneficio</Th>
+                          <Td>{routeInfo.profit}</Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
+                  </Box>
+                </Grid>
+              </CardBody>
+            </Card>
+          </Box>
         )}
-      </div>
-    </div>
+      </Flex>
+    </Container>
   );
 };
-
