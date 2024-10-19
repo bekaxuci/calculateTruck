@@ -8,7 +8,8 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
 import logging
-import os
+import requests
+import urllib.request
 
 api = Blueprint('api', __name__)
 
@@ -113,3 +114,22 @@ def login_user():
     except Exception as e:
         logging.error(f"Error en /login: {e}")
         return jsonify({"error": f"Error interno del servidor: {str(e)}"}), 500
+
+
+@api.route('/api/routes', methods=['GET'])
+def get_route():
+    origin = request.args.get('origin')
+    destination = request.args.get('destination')
+    api_key = "AIzaSyA7WUH-f6itwbbNixJSXznp57uDH0bDfSM"
+
+    if not origin or not destination:
+        return jsonify({"error": "Origin and destination are required"}), 400
+
+    url = f"https://maps.googleapis.com/maps/api/directions/json?origin={origin}&destination={destination}&key={api_key}"
+    
+    try:
+        response = requests.get(url)
+        data = response.json()
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
