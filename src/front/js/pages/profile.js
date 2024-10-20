@@ -76,7 +76,6 @@ export const Profile = () => {
             <Card>
               <CardBody>
                 <VStack align="start">
-                  <Heading as="h1" size="lg">Planner</Heading>
                   <CalculateDistance
                     map={map}
                     onRouteCalculated={handleRouteCalculated}
@@ -93,7 +92,7 @@ export const Profile = () => {
                 <Box
                   ref={mapRef}
                   height="100%"
-                  minHeight="500px"
+                  minHeight="600px"
                   borderRadius="10px"
                   borderWidth="1px"
                   borderColor="blue.400"

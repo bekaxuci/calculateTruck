@@ -205,85 +205,85 @@ const CalculateDistance = ({ map, onRouteCalculated, onRouteInfo, onClearRoute }
   };
 
   return (
-    <Box borderWidth={1} borderRadius="lg" p={5} boxShadow="lg">
-      <Text fontSize="xl" mb={3}>Paradas</Text>
-      {stops.map((stop, index) => (
-        <Stack key={stop.key} mb={2} direction="row" alignItems="center">
-          <Input
-            id={`location-${index}`}
-            placeholder={index === 0 ? "Origen" : index === stops.length - 1 ? "Destino final" : `Parada ${index}`}
-            value={stop.location}
-            onChange={(e) => updateStop(index, 'location', e.target.value)}
-          />
-          {index === stops.length - 1 && (
-            <Button onClick={addStop} colorScheme="teal">+</Button>
-          )}
-          {stops.length > 2 && index !== 0 && index !== stops.length - 1 && (
-            <Button onClick={() => removeStop(index)} colorScheme="red">×</Button>
-          )}
-        </Stack>
-      ))}
+      <Box borderWidth={1} borderRadius="lg" p={5} boxShadow="lg" width="400px" height="600px">
+        <Text fontSize="xl" mb={3}>Paradas</Text>
+        {stops.map((stop, index) => (
+          <Stack key={stop.key} mb={2} direction="row" alignItems="center">
+            <Input
+              id={`location-${index}`}
+              placeholder={index === 0 ? "Origen" : index === stops.length - 1 ? "Destino final" : `Parada ${index}`}
+              value={stop.location}
+              onChange={(e) => updateStop(index, 'location', e.target.value)}
+            />
+            {index === stops.length - 1 && (
+              <Button onClick={addStop} colorScheme="teal">+</Button>
+            )}
+            {stops.length > 2 && index !== 0 && index !== stops.length - 1 && (
+              <Button onClick={() => removeStop(index)} colorScheme="red">×</Button>
+            )}
+          </Stack>
+        ))}
 
-      <FormControl mt={3}>
-        <FormLabel>Tipo de contenedor:</FormLabel>
-        <Select
-          value={containerType}
-          onChange={(e) => setContainerType(e.target.value)}
-        >
-          <option value="">Selecciona un tipo</option>
-          <option value="20">20'</option>
-          <option value="40">40'</option>
-          <option value="20reefer">20' Reefer</option>
-          <option value="40reefer">40' Reefer</option>
-        </Select>
-      </FormControl>
+        <FormControl mt={3}>
+          <FormLabel>Tipo de contenedor:</FormLabel>
+          <Select
+            value={containerType}
+            onChange={(e) => setContainerType(e.target.value)}
+          >
+            <option value="">Selecciona un tipo</option>
+            <option value="20">20'</option>
+            <option value="40">40'</option>
+            <option value="20reefer">20' Reefer</option>
+            <option value="40reefer">40' Reefer</option>
+          </Select>
+        </FormControl>
 
-      <FormControl mt={3}>
-        <FormLabel>Peso de la carga (toneladas):</FormLabel>
-        <Input
-          type="number"
-          value={cargoWeight}
-          onChange={(e) => setCargoWeight(parseFloat(e.target.value))}
-          placeholder="Ingresa el peso de la carga"
-        />
-      </FormControl>
-
-      {showWeightAlert && (
-        <Alert status="warning" mt={3}>
-          <AlertIcon />
-          Se aplicará un recargo del 25% debido al exceso de peso.
-        </Alert>
-      )}
-
-      <FormControl mt={3}>
-        <FormLabel>Introducir Tarifa</FormLabel>
-        <Stack direction="row">
+        <FormControl mt={3}>
+          <FormLabel>Peso de la carga (toneladas):</FormLabel>
           <Input
             type="number"
-            value={tarifa}
-            onChange={(e) => setTarifa(e.target.value)}
-            placeholder="Tarifa por km"
+            value={cargoWeight}
+            onChange={(e) => setCargoWeight(parseFloat(e.target.value))}
+            placeholder="Ingresa el peso de la carga"
           />
-        </Stack>
-      </FormControl>
+        </FormControl>
 
-      <FormControl mt={3}>
-        <FormLabel>Opciones adicionales:</FormLabel>
-        {additionalOptions.map((option) => (
-          <Checkbox
-            key={option}
-            isChecked={selectedOptions.includes(option)}
-            onChange={() => handleOptionChange(option)}
-            mt={2}
-          >
-            {option}
-          </Checkbox>
-        ))}
-      </FormControl>
+        {showWeightAlert && (
+          <Alert status="warning" mt={3}>
+            <AlertIcon />
+            Se aplicará un recargo del 25% debido al exceso de peso.
+          </Alert>
+        )}
 
-      <Button mt={4} colorScheme="blue" onClick={calculateRoute}>Calcular ruta</Button>
-      <Button mt={4} ml={2} colorScheme="gray" onClick={resetRoute}>Restablecer</Button>
-    </Box>
+        <FormControl mt={3}>
+          <FormLabel>Introducir Tarifa</FormLabel>
+          <Stack direction="row">
+            <Input
+              type="number"
+              value={tarifa}
+              onChange={(e) => setTarifa(e.target.value)}
+              placeholder="Tarifa por km"
+            />
+          </Stack>
+        </FormControl>
+
+        <FormControl mt={3}>
+          <FormLabel>Opciones adicionales:</FormLabel>
+          {additionalOptions.map((option) => (
+            <Checkbox
+              key={option}
+              isChecked={selectedOptions.includes(option)}
+              onChange={() => handleOptionChange(option)}
+              mt={2}
+            >
+              {option}
+            </Checkbox>
+          ))}
+        </FormControl>
+
+        <Button mt={4} colorScheme="blue" onClick={calculateRoute}>Calcular ruta</Button>
+        <Button mt={4} ml={2} colorScheme="gray" onClick={resetRoute}>Restablecer</Button>
+      </Box>
   );
 };
 
